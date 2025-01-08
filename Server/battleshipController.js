@@ -10,6 +10,21 @@ class BattleshipController{
         this.games[gameId] = new BattleshipLogic();
         res.json({ gameId, message: "Pradetas zaidimas" });
     }
+
+    getGameInfo(req, res) {
+        const { gameId } = req.params;
+        const game = this.games[gameId];
+
+        if (!game) {
+            return res.status(404).json({ error: "Žaidimas nerastas" });
+        }
+
+        res.json({
+            board: game.board,
+            remainingShots: game.remainingShots,
+            shipsLeft: game.shipsLeft,
+        });
+    }
 }
 
 

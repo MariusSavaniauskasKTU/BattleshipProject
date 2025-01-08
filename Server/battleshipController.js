@@ -16,7 +16,7 @@ class BattleshipController{
         const game = this.games[gameId];
 
         if (!game) {
-            return res.status(404).json({ error: "Žaidimas nerastas" });
+            return res.status(404).json({ error: "Zaidimas nerastas" });
         }
 
         res.json({

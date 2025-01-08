@@ -133,7 +133,94 @@ class BattleshipLogic {
         return board;
     }
 
+    shoot(x, y) {
+        if (x < 0 || x >= this.board[0].length || y < 0 || y >= this.board.length) {
+            return { success: false, message: "Shot out of bounds!" };
+        }
     
+        if (this.board[y][x] === 2 || this.board[y][x] === 3 || this.board[y][x] === 4) {
+            return { success: false, message: "Cell has already been shot" };
+        }
+    
+        if (this.board[y][x] === 0) {
+            // Miss
+            this.board[y][x] = 2;
+            this.remainingShots--;
+            return { success: true, result: "miss", board: this.board };
+        } else if (this.board[y][x] === 1) {
+            // Hit
+            this.board[y][x] = 3;
+            
+            if (this.isShipSunk(x, y)) {
+                this.markSunkShip(x, y);
+                this.shipsLeft--;
+                const gameOver = this.shipsLeft === 0;
+                return { 
+                    success: true, 
+                    result: "sunk", 
+                    gameOver, 
+                    board: this.board 
+                };
+            }
+    
+            return { success: true, result: "hit", board: this.board };
+        }
+
+        return { success: false, message: "Very bad : (" };
+    }
+
+    isShipSunk(x, y) {
+        const directions = [
+            [0, 1],  // Down
+            [1, 0],  // Right
+            [0, -1], // Up
+            [-1, 0], // Left
+        ];
+    
+        for (let [dx, dy] of directions) {
+            let nx = x, ny = y;
+    
+            while (this.inBounds(nx, ny) && (this.board[ny][nx] === 1 || this.board[ny][nx] === 3)) {
+                if (this.board[ny][nx] === 1) {
+                    return false;
+                }
+                nx += dx;
+                ny += dy;
+            }
+        }
+
+        return true;
+    }
+
+    markSunkShip(x, y) {
+        const directions = [
+            [0, 1],  // Down
+            [1, 0],  // Right
+            [0, -1], // Up
+            [-1, 0], // Left
+        ];
+    
+        const queue = [[x, y]];
+    
+        while (queue.length > 0) {
+            const [cx, cy] = queue.shift();
+    
+            this.board[cy][cx] = 4;
+    
+            for (let [dx, dy] of directions) {
+                const nx = cx + dx;
+                const ny = cy + dy;
+    
+                if (this.inBounds(nx, ny) && this.board[ny][nx] === 3) {
+                    queue.push([nx, ny]);
+                }
+            }
+        }
+    }
+
+    inBounds(x, y) {
+        return x >= 0 && x < this.board[0].length && y >= 0 && y < this.board.length;
+    }
 
 }
 

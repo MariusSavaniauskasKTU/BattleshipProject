@@ -12,7 +12,7 @@ app.use("/game", battleshipRoutes);
 //    res.send("Ar veikia?");
 //});
 
-const PORT = 3000;
+const PORT = 3001;
 app.listen(PORT, () => {
     console.log(`Serveris paleistas: http://localhost:${PORT}`);
 });

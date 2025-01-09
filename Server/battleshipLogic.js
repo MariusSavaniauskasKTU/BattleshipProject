@@ -135,38 +135,64 @@ class BattleshipLogic {
 
     shoot(x, y) {
         if (x < 0 || x >= this.board[0].length || y < 0 || y >= this.board.length) {
-            return { success: false, message: "Shot out of bounds!" };
+            return { 
+                board: this.board,
+                remainingShots: this.remainingShots,
+                shipsLeft: this.shipsLeft, // Include ships left
+                message: "Shot out of bounds!",
+                gameOver: false,
+                win: false
+            };
         }
     
         if (this.board[y][x] === 2 || this.board[y][x] === 3 || this.board[y][x] === 4) {
-            return { success: false, message: "Cell has already been shot" };
+            return { 
+                board: this.board,
+                remainingShots: this.remainingShots,
+                shipsLeft: this.shipsLeft, // Include ships left
+                message: "Cell has already been shot",
+                gameOver: false,
+                win: false
+            };
         }
+    
+        let message = "Keep going!";
+        let gameOver = false;
     
         if (this.board[y][x] === 0) {
             // Miss
             this.board[y][x] = 2;
             this.remainingShots--;
-            return { success: true, result: "miss", board: this.board };
+            message = "Miss!";
         } else if (this.board[y][x] === 1) {
             // Hit
             this.board[y][x] = 3;
-            
+    
             if (this.isShipSunk(x, y)) {
                 this.markSunkShip(x, y);
                 this.shipsLeft--;
-                const gameOver = this.shipsLeft === 0;
-                return { 
-                    success: true, 
-                    result: "sunk", 
-                    gameOver, 
-                    board: this.board 
-                };
+                message = "You sunk a ship!";
+            } else {
+                message = "Hit!";
             }
-    
-            return { success: true, result: "hit", board: this.board };
         }
-
-        return { success: false, message: "Very bad : (" };
+    
+        if (this.shipsLeft === 0) {
+            gameOver = true;
+            message = "You win!";
+        } else if (this.remainingShots === 0) {
+            gameOver = true;
+            message = "You lose!";
+        }
+    
+        return {
+            board: this.board,
+            remainingShots: this.remainingShots,
+            shipsLeft: this.shipsLeft, // Include ships left
+            message,
+            gameOver,
+            win: this.shipsLeft === 0
+        };
     }
 
     isShipSunk(x, y) {
